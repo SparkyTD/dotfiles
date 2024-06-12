@@ -1,0 +1,43 @@
+    OpenRGB v0.9
+    Commit:  from 
+    Launched: 20240612_031126
+====================================================================================================
+
+1003  |Info:    Saving detector settings
+1007  |Info:    ------------------------------------------------------
+1007  |Info:    |               Start device detection               |
+1007  |Info:    ------------------------------------------------------
+1007  |Info:    Initializing HID interfaces: Success
+1012  |Info:    ------------------------------------------------------
+1012  |Info:    |             Detecting I2C interfaces               |
+1012  |Info:    ------------------------------------------------------
+1013  |Info:    Registering I2C interface: /dev/i2c-3 Device 10DE:2484 Subsystem: 1458:4069
+1013  |Info:    Registering I2C interface: /dev/i2c-6 Device 10DE:2484 Subsystem: 1458:4069
+1013  |Info:    Registering I2C interface: /dev/i2c-4 Device 10DE:2484 Subsystem: 1458:4069
+1013  |Info:    Registering I2C interface: /dev/i2c-2 Device 10DE:2484 Subsystem: 1458:4069
+1013  |Info:    Registering I2C interface: /dev/i2c-7 Device 8086:A2A3 Subsystem: 1043:8694
+1014  |Info:    Registering I2C interface: /dev/i2c-5 Device 10DE:2484 Subsystem: 1458:4069
+1014  |Info:    ------------------------------------------------------
+1014  |Info:    |               Detecting I2C devices                |
+1014  |Info:    ------------------------------------------------------
+1297  |Info:    ------------------------------------------------------
+1297  |Info:    |               Detecting I2C PCI devices            |
+1297  |Info:    ------------------------------------------------------
+1299  |Info:    ------------------------------------------------------
+1299  |Info:    |               Detecting HID devices                |
+1299  |Info:    ------------------------------------------------------
+1312  |Info:    [KLM] Created new Full 104 key ANSI QWERTY with 6 rows and 21 columns containing 104 keys
+1312  |Info:    [Razer Ornata Chroma] Registering RGB controller
+1323  |Info:    [Razer Basilisk V2] Registering RGB controller
+1323  |Info:    ------------------------------------------------------
+1323  |Info:    |            Detecting libusb HID devices            |
+1323  |Info:    ------------------------------------------------------
+1337  |Info:    ------------------------------------------------------
+1337  |Info:    |              Detecting other devices               |
+1337  |Info:    ------------------------------------------------------
+1346  |Info:    ------------------------------------------------------
+1346  |Info:    |                Detection completed                 |
+1346  |Info:    ------------------------------------------------------
+1346  |Dialog:  <h2>WARNING:</h2><p>One or more I2C/SMBus interfaces failed to initialize.</p><p>RGB DRAM modules and some motherboards' onboard RGB lighting will not be available without I2C/SMBus.</p><p>On Linux, this is usually because the i2c-dev module is not loaded.  You must load the i2c-dev module along with the correct i2c driver for your motherboard.  This is usually i2c-piix4 for AMD systems and i2c-i801 for Intel systems.</p><p>See <a href='https://help.openrgb.org/'>help.openrgb.org</a> for additional troubleshooting steps if you keep seeing this message.<br></p>
+109184|Info:    Found file: pride.orp attempting to validate header
+109184|Info:    Valid v4 profile found for pride
