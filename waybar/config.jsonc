@@ -6,7 +6,7 @@
     "passthrough": false,
     "gtk-layer-shell": true,
     "height": 40,
-    "output": "DP-3",
+    "output": "eDP-1",
     "modules-left": ["clock"],
     "modules-center": ["hyprland/window"],
     "modules-right": ["network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "tray"],
