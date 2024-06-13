@@ -1,6 +1,6 @@
 configuration{
     modi: "drun";
-    font: "Ubuntu Nerd Font 12";
+    font: "FiraCode Nerd Font Mono";
     lines: 5;
     show-icons: true;
     icon-theme: "Oranchelo";
