@@ -11,8 +11,8 @@ LOCALE="en_US.UTF-8"
 # Packages
 PACKAGES_BASE=(base base-devel linux linux-firmware linux-headers sudo)
 PACKAGES_BOOT=(os-prober grub efibootmgr dosfstools mtools)
-PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less github-cli networkmanager openssh tmux pavucontrol pipewire-pulse github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nwg-look nmap openbsd-netcat)
-PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland)
+PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less github-cli networkmanager openssh tmux pavucontrol pipewire-pulse github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nmap openbsd-netcat)
+PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct nwg-look kvantum kvantum-qt5 dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland)
 PACKAGES_YAY=(google-chrome spotify discord github-desktop-bin jetbrains-toolbox postman-bin wdisplays grimshot imhex-bin)
 
 
