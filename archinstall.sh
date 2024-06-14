@@ -564,6 +564,7 @@ arch_install_user() {
 	makepkg -si
 	
 	# Autodetect and mount Windows EFI partition (WINEFI=1)
+	set +e
 	echo -e "${YELLOW}Detecting Windows installations...${NC}"
 	WINEFI=0
 	sudo mkdir -p /mnt/efi
@@ -580,6 +581,7 @@ arch_install_user() {
 			fi
 		fi
 	done
+	set -e
 	
 	# Set GRUB_TIMEOUT=20, GRUB_DISABLE_OS_PROBER=false in /etc/default/grub
 	sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=20/' /etc/default/grub
