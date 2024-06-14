@@ -12,7 +12,7 @@ LOCALE="en_US.UTF-8"
 PACKAGES_BASE=(base base-devel linux linux-firmware linux-headers sudo)
 PACKAGES_BOOT=(os-prober grub efibootmgr dosfstools mtools)
 PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less tldr github-cli networkmanager openssh tmux pavucontrol pipewire-pulse github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nmap openbsd-netcat dbus-broker-units mkinitcpio)
-PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct nwg-look kvantum kvantum-qt5 dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland python-pywal)
+PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct nwg-look kvantum kvantum-qt5 nautilus dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland python-pywal)
 PACKAGES_YAY=(google-chrome spotify discord github-desktop-bin jetbrains-toolbox postman-bin wdisplays grimshot imhex-bin)
 
 
@@ -548,6 +548,7 @@ arch_install_user() {
 	# Install yay
 	echo -e "${YELLOW}Installing Yay and necessary build tools...${NC}"
 	sudo pacman -S --needed base-devel git
+	sudo mkdir -p /installer/git/
 	cd /installer/git/
 	git clone https://aur.archlinux.org/yay.git
 	cd yay
