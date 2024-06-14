@@ -311,7 +311,7 @@ enable_ssh() {
 	echo PermitRootLogin yes >> /etc/ssh/sshd_config
 	echo PasswordAuthentication yes >> /etc/ssh/sshd_config
 	echo PermitEmptyPasswords yes >> /etc/ssh/sshd_config
-	
+		
 	systemctl stop sshd
 	systemctl enable --now sshd
 	
@@ -320,54 +320,35 @@ enable_ssh() {
 }
 
 set_root_login_prompt() {
-  if [ -z "$1" ]; then
-    echo "Usage: set_root_login_prompt <custom_command>"
-    return 1
-  fi
+	local username="$1"
+	local command="$2"
+	
+	if [ -z "$username" ] -or [ -z "$command" ]; then
+		echo "Usage: set_root_login_prompt <username> <command>"
+		return 1
+	fi
 
-  local custom_command="$1"
-  local service_name="custom-login-prompt"
+	local service_name="custom-login-prompt"
 
-  # Create a systemd service file
-  cat <<EOF | sudo tee /etc/systemd/system/${service_name}.service >/dev/null
-[Unit]
-Description=Custom Login Prompt
-After=network.target
-
+	# Create a systemd service file
+	mkdir -p /etc/systemd/system/getty@tty1.service.d/
+	cat <<EOF | sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf >/dev/null
 [Service]
-ExecStart=/bin/bash -c '${custom_command}'
-StandardInput=tty
-StandardOutput=tty
-StandardError=tty
-TTYPath=/dev/tty1
-TTYReset=yes
-TTYVHangup=yes
-TTYVTDisallocate=yes
-KillMode=process
-IgnoreSIGPIPE=no
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin username %I $TERM
 
-[Install]
-WantedBy=multi-user.target
 EOF
 
-  # Disable the default getty service on tty1
-  sudo systemctl disable getty@tty1.service
-  sudo systemctl stop getty@tty1.service
+	local user_home=$(eval echo ~$username)
+	local profile_file="$user_home/.bash_profile"
+	echo "$command" > "$profile_file"
 
-  # Enable and start the custom service
-  sudo systemctl enable ${service_name}.service
-  sudo systemctl start ${service_name}.service
-
-  echo "Custom login prompt set successfully. Reboot to apply changes."
+	echo "Custom login prompt set successfully."
 }
 
 revert_root_login_prompt() {
-    local service_path="/etc/systemd/system/root-login-prompt.service"
-    
-    systemctl stop root-login-prompt.service
-    systemctl disable root-login-prompt.service
-    rm -f "$service_path"
-    systemctl daemon-reload
+    sudo rm /etc/systemd/system/getty@tty1.service.d/autologin.conf
+	sudo truncate -s 0 ~/.bash_profile
 }
 
 #########################
@@ -483,7 +464,7 @@ arch_install_chroot() {
     done
     
     # Prompt for non-root user, configure password
-    USER_NAME=
+    USER_NAME="root"
     if prompt_bool "Create a new non-root user?" "y"; then
         while true; do
             echo -e "${CYAN}Enter a username: ${NC}"
@@ -539,15 +520,14 @@ arch_install_chroot() {
     pacman -Sy --noconfirm
     
     # Autolaunch this script in /home/$UNAME/.bash_profile or /root/.bash_profile with ENV_USER=1
-    profile_file="/root/.bash_profile"
-    [ ! -z "$USER_NAME" ] && profile_file="/home/$USER_NAME/.bash_profile"
-    echo "ENV_USER=1 bash /installer/archinstall.sh" > "$profile_file"
+	[ ! -z "$USER_NAME" ] && set_root_login_prompt "$USER_NAME" "ENV_USER=1 bash /installer/archinstall.sh"
 }
 
 # 3. TargetUser
 arch_install_user() {
 	echo -e "${GREEN}Hello from arch_install_user()${NC}"
 	ensure_root 0
+	revert_root_login_prompt
 
 	# Install nvidia-all
 	detect_nvidia
@@ -717,3 +697,4 @@ else
 	echo "Unknown environment, aborting."
 	exit 1
 fi
+
