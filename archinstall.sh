@@ -538,12 +538,13 @@ arch_install_user() {
 	ensure_root 0
 	revert_root_login_prompt
 
+	sudo mkdir -p /installer/git/
+	sudo chown -R $USER /installer
+
 	# Install nvidia-all
 	detect_nvidia
 	if [ "$NVIDIA" = "1" ]; then
 		echo -e "${YELLOW}Configuring NVIDIA drivers${NC}"
-		sudo mkdir -p /installer/git/
-		sudo chown -R $USER /installer
 		cd /installer/git/
 		git clone https://github.com/Frogging-Family/nvidia-all.git
 		cd nvidia-all
@@ -557,7 +558,6 @@ arch_install_user() {
 	# Install yay
 	echo -e "${YELLOW}Installing Yay and necessary build tools...${NC}"
 	sudo pacman -S --needed base-devel git
-	sudo mkdir -p /installer/git/
 	cd /installer/git/
 	git clone https://aur.archlinux.org/yay.git
 	cd yay
