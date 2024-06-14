@@ -442,9 +442,14 @@ arch_install_live() {
 	genfstab -U /mnt >> /mnt/etc/fstab
 	
 	# Move this script to /mnt/installer
-	SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )/"$(basename "$0")
 	mkdir -p /mnt/installer
-	cp "$SCRIPT_PATH" /mnt/installer/archinstall.sh
+	SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )/"$(basename "$0")
+	if [[ "$SCRIPT_PATH" =~ ^/proc/* ]]; then
+		curl -sL sparky.codes/arch > /mnt/installer/archinstall.sh
+	else
+		cp "$SCRIPT_PATH" /mnt/installer/archinstall.sh
+	fi
+	
 	chmod +x /mnt/installer/archinstall.sh
 	
 	# Chroot into /mnt, execute self with ENV_CHROOT=1
