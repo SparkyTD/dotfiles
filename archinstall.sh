@@ -405,7 +405,7 @@ arch_install_live() {
 	# Bootstrap Arch
 	echo -e "${YELLOW}Bootstrapping Arch...${NC}"
 	PACKAGES=("${PACKAGES_BASE[@]}" "${PACKAGES_BOOT[@]}" "${PACKAGES_EXTRA[@]}")
-	pacstrap -i /mnt "${PACKAGES[@]}"
+	yes | pacstrap -i /mnt "${PACKAGES[@]}"
 	genfstab -U /mnt >> /mnt/etc/fstab
 	
 	# Move this script to /mnt/installer
