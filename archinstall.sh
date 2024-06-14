@@ -11,7 +11,7 @@ LOCALE="en_US.UTF-8"
 # Packages
 PACKAGES_BASE=(base base-devel linux linux-firmware linux-headers sudo)
 PACKAGES_BOOT=(os-prober grub efibootmgr dosfstools mtools)
-PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less tldr github-cli networkmanager openssh tmux pavucontrol pipewire-pulse github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nmap openbsd-netcat)
+PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less tldr github-cli networkmanager openssh tmux pavucontrol pipewire-pulse github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nmap openbsd-netcat dbus-broker-units mkinitcpio)
 PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct nwg-look kvantum kvantum-qt5 dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland python-pywal)
 PACKAGES_YAY=(google-chrome spotify discord github-desktop-bin jetbrains-toolbox postman-bin wdisplays grimshot imhex-bin)
 
@@ -369,12 +369,12 @@ arch_install_live() {
 
 	
 	echo -e "${CYAN}Partitioning summary:${NC}"
-	echo -e "   ${MAGENTA}EFI:${NC} $DEV_EFI"
-	echo -e "   ${MAGENTA}ROOT:${NC} $DEV_ROOT"
+	echo -e "   ${GREEN}EFI:${NC} $DEV_EFI"
+	echo -e "   ${GREEN}ROOT:${NC} $DEV_ROOT"
 	if [ "$NOSWAP" != "1" ]; then
-		echo -e "   ${MAGENTA}SWAP:${NC} $DEV_SWAP"
+		echo -e "   ${GREEN}SWAP:${NC} $DEV_SWAP"
 	else
-		echo -e "   ${MAGENTA}SWAP:${NC} (none)"
+		echo -e "   ${GREEN}SWAP:${NC} (none)"
 	fi
 	
 	if ! prompt_bool "Continue with the selected partitioning layout?" "n"; then
