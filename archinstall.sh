@@ -659,6 +659,9 @@ arch_install_postgui() {
 ## INSTALL PHASE SELECTOR ##
 ############################
 
+# Exit on error
+set -e
+
 # Check network access
 check_network_access
 
