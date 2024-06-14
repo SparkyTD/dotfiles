@@ -456,6 +456,7 @@ arch_install_chroot() {
                 echo -e "${RED}Invalid username. It must start with a letter and can only contain lowercase letters, digits, underscores, and dashes.${NC}"
             fi
         done
+		groupadd plugdev
         useradd -m -g users -G wheel,storage,power,video,audio,plugdev -s /bin/bash ${username}
         USER_NAME="${username}"
         echo -e "${YELLOW}Enter ${username}'s password:${NC}"
