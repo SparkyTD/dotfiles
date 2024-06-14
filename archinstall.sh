@@ -525,6 +525,7 @@ arch_install_chroot() {
     # Enable NetworkManager
     echo -e "${GREEN}Enabling NetworkManager...${NC}"
     systemctl enable NetworkManager
+	systemctl enable dhcpcd
     
     # Configure GRUB bootloader
     echo -e "${YELLOW}Installing and configuring GRUB bootloader...${NC}"
