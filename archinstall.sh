@@ -343,6 +343,14 @@ EOF
 	local profile_file="$user_home/.bash_profile"
 	echo "$command" > $profile_file
 	chmod +x $profile_file
+		
+	cat <<EOF | sudo tee $profile_file >/dev/null
+echo "Launching post-install script... "
+sudo chmod +x /installer/archinstall.sh
+ENV_USER=1 /installer/archinstall.sh
+echo "Done!"
+
+EOF
 
 	echo "Custom login prompt set successfully."
 }
