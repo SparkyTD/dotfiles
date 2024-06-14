@@ -356,8 +356,10 @@ EOF
 }
 
 revert_root_login_prompt() {
+	set +e
     sudo rm /etc/systemd/system/getty@tty1.service.d/autologin.conf
 	sudo truncate -s 0 ~/.bash_profile
+	set -e
 }
 
 #########################
