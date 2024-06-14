@@ -362,6 +362,8 @@ revert_root_login_prompt() {
 	set -e
 }
 
+
+
 #########################
 ## INSTALLATION STAGES ##
 #########################
