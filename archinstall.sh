@@ -320,24 +320,45 @@ enable_ssh() {
 }
 
 set_root_login_prompt() {
-    local command_line="$1"
-    local service_path="/etc/systemd/system/root-login-prompt.service"
-    
-    cat <<EOF > "$service_path"
+  if [ -z "$1" ]; then
+    echo "Usage: set_root_login_prompt <custom_command>"
+    return 1
+  fi
+
+  local custom_command="$1"
+  local service_name="custom-login-prompt"
+
+  # Create a systemd service file
+  cat <<EOF | sudo tee /etc/systemd/system/${service_name}.service >/dev/null
 [Unit]
-Description=Custom root login prompt
+Description=Custom Login Prompt
+After=network.target
 
 [Service]
-Type=simple
-ExecStart=$command_line
+ExecStart=/bin/bash -c '${custom_command}'
+StandardInput=tty
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+KillMode=process
+IgnoreSIGPIPE=no
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-    systemctl daemon-reload
-    systemctl enable root-login-prompt.service
-    systemctl start root-login-prompt.service
+  # Disable the default getty service on tty1
+  sudo systemctl disable getty@tty1.service
+  sudo systemctl stop getty@tty1.service
+
+  # Enable and start the custom service
+  sudo systemctl enable ${service_name}.service
+  sudo systemctl start ${service_name}.service
+
+  echo "Custom login prompt set successfully. Reboot to apply changes."
 }
 
 revert_root_login_prompt() {
