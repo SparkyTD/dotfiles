@@ -542,6 +542,10 @@ arch_install_user() {
 
 	sudo mkdir -p /installer/git/
 	sudo chown -R $USER /installer
+	
+	# Miscellaneous stuff
+    echo -e "${CYAN}Configuring git default branch to 'master'...${NC}"
+    git config --global init.defaultBranch master
 
 	# Install nvidia-all
 	detect_nvidia
@@ -631,7 +635,7 @@ arch_install_user() {
 	
 	detect_razer
 	
-	yay -S gdb ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite xorg-xinput libxrender pixman wayland-protocols cairo pango seatd libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang hyprcursor hyprwayland-scanner xcb-util-errors
+	yes | yay -S gdb ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite xorg-xinput libxrender pixman wayland-protocols cairo pango seatd libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang hyprcursor hyprwayland-scanner xcb-util-errors
 	
 	if is_host_vmware; then
 		echo -e "${YELLOW}Running inside a VM, installing necessary packages...${NC}"
@@ -660,11 +664,7 @@ arch_install_postgui() {
     
     # Installing extra software
     echo -e "${YELLOW}Installing additional packages...${NC}"
-    yay -Sy "${PACKAGES_YAY[@]}"
-    
-    # Miscellaneous stuff
-    echo -e "${CYAN}Configuring git default branch to 'master'...${NC}"
-    git config --global init.defaultBranch master
+    yes | yay -Sy "${PACKAGES_YAY[@]}"
     
     # Update Hyprland PM and add plugins
     echo -e "${YELLOW}Updating Hyprland PM and adding plugin repos...${NC}"
