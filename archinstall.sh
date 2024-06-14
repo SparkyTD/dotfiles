@@ -22,12 +22,14 @@ PACKAGES_YAY=(google-chrome spotify discord github-desktop-bin jetbrains-toolbox
 ######################
 
 # Color codes
-RED="\033[1;31m"
-GREEN="\033[1;32m"
-YELLOW="\033[1;33m"
-BLUE="\033[1;34m"
-CYAN="\033[1;36m"
-NC="\033[0m"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 # Helpers
 ensure_root() {
@@ -50,114 +52,6 @@ ensure_root() {
         echo -e "\033[1;31mInvalid argument: $1\033[0m"  # Red for invalid input
         exit 1
     fi
-}
-
-select_partition() {
-    local prompt="$1"
-    local result_var="$2"
-    local optional="$3"
-    echo -e "${BLUE}$prompt${NC}"  # Display prompt in blue and bold
-
-    local options=()
-    local i=1
-    while IFS=' ' read -r dev size type fstype mountpoint; do
-        if [[ $type == "part" ]]; then
-            local highlight="${NC}"  # Default no color
-            local label=""
-            if [[ "/dev/$dev" == "$DEV_EFI" ]]; then
-                highlight="${GREEN}"  # Green for selected devices
-                label=" (DEV_EFI)"
-            elif [[ "/dev/$dev" == "$DEV_ROOT" ]]; then
-                highlight="${GREEN}"
-                label=" (DEV_ROOT)"
-            elif [[ "/dev/$dev" == "$DEV_SWAP" ]]; then
-                highlight="${GREEN}"
-                label=" (DEV_SWAP)"
-            fi
-
-            local display_string="    $i) /dev/${dev}: $size, $fstype${label}"
-            echo -e "${highlight}${display_string}${NC}"
-
-            options+=("/dev/$dev")
-            i=$((i+1))
-        fi
-    done < <(lsblk -lno NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT)
-
-    if [ "$optional" -eq "1" ]; then
-        options+=("(none)")
-        echo -e "${YELLOW}    $i) (none)${NC}"  # Display '(none)' in yellow
-    else
-        i=$((i-1))
-    fi
-
-    local index
-    while true; do
-        echo -e -n "${CYAN}Selection (1..$i): ${NC}"  # Cyan for the selection prompt
-        read index
-        if [[ $index =~ ^[0-9]+$ ]] && [ $index -ge 1 ] && [ $index -le $i ]; then
-            break
-        else
-            echo -e "${RED}Invalid selection, please try again.${NC}"  # Red for error message
-        fi
-    done
-
-    # Correcting the use of declare to properly set the global variable
-    declare -g "$result_var=${options[$((index-1))]}"
-}
-
-select_timezone() {
-    if [[ -n "$TIMEZONE" && -f "/usr/share/zoneinfo/$TIMEZONE" ]]; then
-        echo -e "${GREEN}Timezone already set to: $TIMEZONE${NC}"
-        return 0
-    fi
-
-    local continent city continent_path city_path
-    while true; do
-        echo -e "${BLUE}Select a continent (enter '?' to list all valid options):${NC}"
-        read continent
-        if [[ "$continent" == "?" ]]; then
-            echo -e "${YELLOW}Available Continents:${NC}"
-            find /usr/share/zoneinfo -mindepth 1 -maxdepth 1 -type d | rev | cut -d '/' -f 1 | rev | grep '^[A-Z]' | column
-            continue
-        fi
-
-        continent_path="/usr/share/zoneinfo/$continent"
-        if [[ ! -d "$continent_path" ]]; then
-            echo -e "${RED}Invalid continent. Please try again.${NC}"
-            continue
-        fi
-
-        while true; do
-            echo -e "${BLUE}Select a city from $continent (enter '?' for options, 'back' to select another continent):${NC}"
-            read city
-            if [[ "$city" == "back" ]]; then
-                break
-            elif [[ "$city" == "?" ]]; then
-                echo -e "${YELLOW}Available Cities in $continent:${NC}"
-                find "$continent_path" -mindepth 1 -maxdepth 1 -type f | rev | cut -d '/' -f 1 | rev | grep '^[A-Z]' | column
-                continue
-            fi
-
-            city_path="$continent_path/$city"
-            if [[ ! -f "$city_path" ]]; then
-                echo -e "${RED}Invalid city. Please try again.${NC}"
-                continue
-            fi
-
-            echo -e "${GREEN}You have selected the timezone: $continent/$city${NC}"
-            declare -g TIMEZONE="$continent/$city"
-            return 0
-        done
-    done
-}
-
-is_valid_username() {
-	local username="$1"
-	if [[ "$username" =~ ^[a-z][a-z0-9_-]*$ ]]; then
-		return 0  # valid
-	else
-		return 1  # invalid
-	fi
 }
 
 prompt_bool() {
@@ -199,6 +93,174 @@ prompt_bool() {
     done
 }
 
+select_partition() {
+    local prompt="$1"
+    local result_var="$2"
+    local optional="$3"
+
+    echo -e "${CYAN}$prompt${NC}"  # Display prompt in blue
+
+    local drives=()
+    local drive_index=1
+    # Only list drives if none is selected yet
+    if [ -z "$SELECTED_DRIVE" ]; then
+        while IFS=' ' read -r name size type; do
+            if [ $type = "disk" ]; then
+                echo -e "${CYAN}    $drive_index) ${GRAY}/dev/$name: ${YELLOW}$size${NC}"
+                drives+=("/dev/$name")
+                drive_index=$((drive_index+1))
+            fi
+        done < <(lsblk -lno NAME,SIZE,TYPE | grep "disk")
+
+        if [ "$optional" = "1" ]; then
+            drives+=("(none)")
+            echo -e "${YELLOW}    $drive_index) (none)${NC}"  # Display '(none)' in yellow
+            drive_index=$((drive_index+1))
+        else
+            drive_index=$((drive_index-1))
+        fi
+
+        local drive_selection
+        while true; do
+            echo -e -n "${BRIGHT_CYAN}Select drive (1..$drive_index): ${NC}"
+            read drive_selection
+            if [[ $drive_selection =~ ^[0-9]+$ ]] && [ $drive_selection -ge 1 ] && [ $drive_selection -le $drive_index ]; then
+                if [ "$optional" = "1" ] && [ $drive_selection -eq $drive_index ]; then
+                    declare -g "$result_var=(none)"
+                    return
+                else
+                    SELECTED_DRIVE="${drives[$((drive_selection-1))]}"
+                fi
+                break
+            else
+                echo -e "${RED}Invalid selection, please try again.${NC}"  # Red for error message
+            fi
+        done
+    fi
+
+    # Select partition from the selected drive
+    local partitions=()
+    local partition_index=1
+    while IFS=' ' read -r dev size type fstype mountpoint; do
+        if [[ $type == "part" ]]; then
+            local label=""
+            local highlight="${GREEN}"  # Green for partitions
+	    local dev_color="${GRAY}"
+            if [[ "/dev/$dev" == "$DEV_EFI" ]]; then
+                label=" (EFI)"
+		dev_color="${GREEN}"
+            elif [[ "/dev/$dev" == "$DEV_ROOT" ]]; then
+                label=" (Root)"
+		dev_color="${GREEN}"
+            elif [[ "/dev/$dev" == "$DEV_SWAP" ]]; then
+                label=" (Swap)"
+		dev_color="${GREEN}"
+            fi
+
+            echo -e "${CYAN}    $partition_index) ${dev_color}/dev/${dev}: ${YELLOW}$size, ${MAGENTA}$fstype${GREEN}${label}${NC}"
+            partitions+=("/dev/$dev")
+            partition_index=$((partition_index+1))
+        fi
+    done < <(lsblk -lno NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT $SELECTED_DRIVE | grep "part")
+
+    if [ "$optional" = "1" ]; then
+        partitions+=("(none)")
+        echo -e "${YELLOW}    $partition_index) (none)${NC}"  # Display '(none)' in yellow
+    else
+        partition_index=$((partition_index-1))
+    fi
+
+    local partition_selection
+    while true; do
+        echo -e -n "${BRIGHT_CYAN}Select partition (1..$partition_index, or 'b' to go back): ${NC}"
+        read partition_selection
+        if [[ $partition_selection == 'b' ]]; then
+            SELECTED_DRIVE=""  # Reset drive selection on back
+            select_partition "$prompt" "$result_var" "$optional"
+            return
+        elif [[ $partition_selection =~ ^[0-9]+$ ]] && [ $partition_selection -ge 1 ] && [ $partition_selection -le $partition_index ]; then
+            break
+        elif [ "$optional" = "1" ] && [ $partition_selection -eq $partition_index ]; then
+            declare -g "$result_var=(none)"
+            return
+        else
+            echo -e "${RED}Invalid selection, please try again.${NC}"
+        fi
+    done
+
+    # Set the result variable globally
+    declare -g "$result_var=${partitions[$((partition_selection-1))]}"
+}
+
+select_timezone() {
+    if [[ -n "$TIMEZONE" && -f "/usr/share/zoneinfo/$TIMEZONE" ]]; then
+        echo -e "${GREEN}Timezone already set to: $TIMEZONE${NC}"
+        return 0
+    fi
+
+    local continent city continent_path city_path matches
+    while true; do
+        echo -e "${CYAN}Select a continent (enter '?' to list all valid options):${NC}"
+        read continent
+        if [[ "$continent" == "?" ]]; then
+            echo -e "${YELLOW}Available Continents:${NC}"
+            find /usr/share/zoneinfo -mindepth 1 -maxdepth 1 -type d | rev | cut -d '/' -f 1 | rev | grep '^[A-Z]' | column
+            continue
+        fi
+
+        matches=$(find /usr/share/zoneinfo -mindepth 1 -maxdepth 1 -type d | rev | cut -d '/' -f 1 | rev | grep -i "^$continent" | wc -l)
+        if (( matches == 1 )); then
+            continent=$(find /usr/share/zoneinfo -mindepth 1 -maxdepth 1 -type d | rev | cut -d '/' -f 1 | rev | grep -i "^$continent")
+        else
+            echo -e "${RED}Invalid or ambiguous continent. Please try again.${NC}"
+            continue
+        fi
+
+        continent_path="/usr/share/zoneinfo/$continent"
+        while true; do
+            echo -e "${CYAN}Select a city from $continent (enter '?' for options, 'back' to select another continent):${NC}"
+            read city
+            if [[ "$city" == "back" ]]; then
+                break
+            elif [[ "$city" == "?" ]]; then
+                echo -e "${YELLOW}Available Cities in $continent:${NC}"
+                find "$continent_path" -mindepth 1 -maxdepth 1 -type f | rev | cut -d '/' -f 1 | rev | grep '^[A-Z]' | column
+                continue
+            fi
+
+            matches=$(find "$continent_path" -mindepth 1 -maxdepth 1 -type f | rev | cut -d '/' -f 1 | rev | grep -i "^$city" | wc -l)
+            if (( matches == 1 )); then
+                city=$(find "$continent_path" -mindepth 1 -maxdepth 1 -type f | rev | cut -d '/' -f 1 | rev | grep -i "^$city")
+            else
+                echo -e "${RED}Invalid or ambiguous city. Please try again.${NC}"
+                continue
+            fi
+
+            city_path="$continent_path/$city"
+            if [[ -f "$city_path" ]]; then
+                echo -e "${GREEN}You have selected the timezone: $continent/$city${NC}"
+                if prompt_bool "Is this correct?" "y"; then
+                    declare -g TIMEZONE="$continent/$city"
+                    return 0
+                else
+                    echo -e "${RED}Please try again.${NC}"
+                fi
+            else
+                echo -e "${RED}Invalid city. Please try again.${NC}"
+            fi
+        done
+    done
+}
+
+is_valid_username() {
+	local username="$1"
+	if [[ "$username" =~ ^[a-z][a-z0-9_-]*$ ]]; then
+		return 0  # valid
+	else
+		return 1  # invalid
+	fi
+}
+
 is_host_vmware() {
     # Check if running inside VMware
     sudo dmidecode -s system-manufacturer 2>/dev/null | grep -iq "VMware"
@@ -228,11 +290,48 @@ detect_nvidia() {
         echo -e "${GREEN}NVIDIA GPU detected. NVIDIA variable set to 1.${NC}"
     else
         NVIDIA=0
-        echo -e "${RED}No NVIDIA GPU detected. NVIDIA variable set to 0.${NC}"
+        echo -e "${YELLOW}No NVIDIA GPU detected. NVIDIA variable set to 0.${NC}"
     fi
 }
 
+detect_razer() {
+    if lsusb | grep -q "1532:"; then
+        echo -e "${GREEN}Razer device detected. Installing openrazer-daemon.${NC}"
+        sudo pacman -S openrazer-daemon
+    else
+        echo -e "${YELLOW}No Razer devices detected.${NC}"
+    fi
+}
 
+set_root_login_prompt() {
+    local command_line="$1"
+    local service_path="/etc/systemd/system/root-login-prompt.service"
+    
+    cat <<EOF > "$service_path"
+[Unit]
+Description=Custom root login prompt
+
+[Service]
+Type=simple
+ExecStart=$command_line
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable root-login-prompt.service
+    systemctl start root-login-prompt.service
+}
+
+revert_root_login_prompt() {
+    local service_path="/etc/systemd/system/root-login-prompt.service"
+    
+    systemctl stop root-login-prompt.service
+    systemctl disable root-login-prompt.service
+    rm -f "$service_path"
+    systemctl daemon-reload
+}
 
 #########################
 ## INSTALLATION STAGES ##
@@ -356,7 +455,7 @@ arch_install_chroot() {
                 echo -e "${RED}Invalid username. It must start with a letter and can only contain lowercase letters, digits, underscores, and dashes.${NC}"
             fi
         done
-        useradd -m -g users -G wheel,storage,power,video,audio -s /bin/bash ${username}
+        useradd -m -g users -G wheel,storage,power,video,audio,plugdev -s /bin/bash ${username}
         USER_NAME="${username}"
         echo -e "${YELLOW}Enter ${username}'s password:${NC}"
         until passwd ${username}; do
@@ -495,6 +594,8 @@ arch_install_user() {
 	# Install core GUI ($PACKAGES_GUI)
 	echo -e "${YELLOW}Installing GUI packages...${NC}"
 	sudo pacman -Sy "${PACKAGES_GUI[@]}"
+	
+	detect_razer
 	
 	yay -S gdb ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite xorg-xinput libxrender pixman wayland-protocols cairo pango seatd libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang hyprcursor hyprwayland-scanner xcb-util-errors
 	
