@@ -341,7 +341,8 @@ EOF
 
 	local user_home=$(eval echo ~$username)
 	local profile_file="$user_home/.bash_profile"
-	echo "$command" > "$profile_file"
+	echo "$command" > $profile_file
+	chmod +x $profile_file
 
 	echo "Custom login prompt set successfully."
 }
@@ -520,7 +521,7 @@ arch_install_chroot() {
     pacman -Sy --noconfirm
     
     # Autolaunch this script in /home/$UNAME/.bash_profile or /root/.bash_profile with ENV_USER=1
-	[ ! -z "$USER_NAME" ] && set_root_login_prompt "$USER_NAME" "ENV_USER=1 bash /installer/archinstall.sh"
+	[ ! -z "$USER_NAME" ] && set_root_login_prompt "$USER_NAME" "ENV_USER=1 /installer/archinstall.sh"
 }
 
 # 3. TargetUser
