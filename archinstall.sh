@@ -304,6 +304,21 @@ detect_razer() {
     fi
 }
 
+enable_ssh() {
+	echo Port 22 >> /etc/ssh/sshd_config
+	echo AddressFamily any >> /etc/ssh/sshd_config
+	echo ListenAddress 0.0.0.0 >> /etc/ssh/sshd_config
+	echo PermitRootLogin yes >> /etc/ssh/sshd_config
+	echo PasswordAuthentication yes >> /etc/ssh/sshd_config
+	echo PermitEmptyPasswords yes >> /etc/ssh/sshd_config
+	
+	systemctl stop sshd
+	systemctl enable --now sshd
+	
+	local ip_address=$(ip route get 1.1.1.1 | awk '{print $7}' | grep -E '.+')
+	echo -e "${CYAN}Root SSH access enabled, IP address: ${YELLOW}$ip_address${NC}"
+}
+
 set_root_login_prompt() {
     local command_line="$1"
     local service_path="/etc/systemd/system/root-login-prompt.service"
@@ -342,6 +357,9 @@ revert_root_login_prompt() {
 arch_install_live() {
 	echo -e "${GREEN}Hello from arch_install_live()${NC}"
 	ensure_root 1
+	
+	# Enable remote SSH access
+	enable_ssh
 	
 	# Update pacman
 	echo -e "${YELLOW}Updating installer packages...${NC}"
@@ -450,7 +468,6 @@ arch_install_chroot() {
             echo -e "${CYAN}Enter a username: ${NC}"
             read username
             if is_valid_username "$username"; then
-                echo -e "${GREEN}Valid username: $username${NC}"
                 break
             else
                 echo -e "${RED}Invalid username. It must start with a letter and can only contain lowercase letters, digits, underscores, and dashes.${NC}"
