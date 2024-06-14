@@ -323,7 +323,7 @@ set_root_login_prompt() {
 	local username="$1"
 	local command="$2"
 	
-	if [ -z "$username" ] -or [ -z "$command" ]; then
+	if [ -z "$username" ] || [ -z "$command" ]; then
 		echo "Usage: set_root_login_prompt <username> <command>"
 		return 1
 	fi
