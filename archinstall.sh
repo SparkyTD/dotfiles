@@ -396,10 +396,42 @@ arch_install_live() {
 	fi
 	
 	if [[ "$DEV_EFI" == "$DEV_ROOT" || "$DEV_EFI" == "$DEV_SWAP" || ("$DEV_SWAP" != "(none)" && "$DEV_ROOT" == "$DEV_SWAP") ]]; then
-		echo -e "${RED}Error: Device variables must be unique.${NC}"
+		echo -e "${RED}Error: Selected partitions must be unique.${NC}"
 		exit 1
 	fi
 
+	# Verify partition sizes
+	local par_size_efi=$(lsblk -b -o SIZE -n "$DEV_EFI")
+	if [[ $par_size_efi -lt $((260 * 1024 * 1024)) || $par_size_efi -gt $((990 * 1024 * 1024)) ]]; then
+		echo -e "${RED}Error: The EFI partition must be at least 260MB, and no more than 990MB.${NC}"
+		exit 1
+	fi
+	
+	local par_size_root=$(lsblk -b -o SIZE -n "$DEV_ROOT")
+	if [[ $par_size_root -lt $((20 * 1024 * 1024 * 1024)) ]]; then
+		echo -e "${RED}Error: The ROOT partition must be at least 20GB.${NC}"
+		exit 1
+	fi
+	
+	if [ "$NOSWAP" != "1" ]; then
+		local par_size_swap=$(lsblk -b -o SIZE -n "$DEV_SWAP")
+		local ram_size=$(free | grep Mem | awk '{print $7}')
+		local swap_confirm=0
+		if [[ $par_size_swap -lt $((256 * 1024 * 1024)) ]]; then
+			swap_confirm=1
+			echo "${YELLOW}The SWAP partition should be at least 256MB.${NC}"
+		elif [[ $par_size_swap -gt $(($ram_size+(1024 * 1024 * 1024 * 1024))) ]]; then
+			swap_confirm=1
+			echo "${YELLOW}The SWAP partition's size shouldn't exceed the total RAM size.${NC}"
+		fi
+		
+		if [ $swap_confirm -eq 1 ]; then
+			if ! prompt_bool "${YELLOW}Continue with the selected SWAP size layout?${NC}" "n"; then
+				echo -e "${RED}Aborting${NC}"
+				exit
+			fi
+		fi
+	fi
 	
 	echo -e "${CYAN}Partitioning summary:${NC}"
 	echo -e "   ${GREEN}EFI:${NC} $DEV_EFI"
