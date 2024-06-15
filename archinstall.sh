@@ -617,6 +617,7 @@ arch_install_user() {
 	
 	# Add nvidia MODULES, regenerate mkinitcpio
 	if [ "$NVIDIA" = "1" ]; then
+		set +e
 		echo -e "${YELLOW}Adding NVIDIA modules to mkinitcpio...${NC}"
 		modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
 		mkinitcpio_conf="/etc/mkinitcpio.conf"
@@ -635,11 +636,12 @@ arch_install_user() {
 		echo "Modules added to MODULES in $mkinitcpio_conf."
 		
 		sudo mkinitcpio -P
+		set -e
 	fi
 	
 	# Install core GUI ($PACKAGES_GUI)
 	echo -e "${YELLOW}Installing GUI packages...${NC}"
-	sudo pacman -Sy "${PACKAGES_GUI[@]}"
+	yes | sudo pacman -Sy "${PACKAGES_GUI[@]}"
 	
 	detect_razer
 	
