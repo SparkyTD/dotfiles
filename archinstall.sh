@@ -452,6 +452,15 @@ arch_install_live() {
 	
 	chmod +x /mnt/installer/archinstall.sh
 	
+	# Transfer wifi connection data, if any
+	if [ -d /var/lib/iwd/ ]; then
+		iwd_data=$(find /var/lib/iwd -type f -name "*.psk" | head -n 1)
+		if [ -f $iwd_data ]; then
+			mkdir -p /mnt/var/lib/iwd/
+			cp "$iwd_data" /mnt/var/lib/iwd/
+		fi
+	fi
+	
 	# Chroot into /mnt, execute self with ENV_CHROOT=1
 	ENV_CHROOT=1 arch-chroot /mnt /installer/archinstall.sh
 	
