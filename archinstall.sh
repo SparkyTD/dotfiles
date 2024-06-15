@@ -724,6 +724,9 @@ arch_install_postgui() {
     hyprpm update
     yes | hyprpm add https://github.com/levnikmyskin/hyprland-virtual-desktops
     yes | hyprpm add https://github.com/hyprwm/hyprland-plugins
+	hyprpm enable hyprland-virtual-desktops
+	hyprpm enable hyprtrails
+	hyprpm reload
     
     # Clone dotfiles repo into .config
     echo -e "${YELLOW}Setting up configuration files...${NC}"
