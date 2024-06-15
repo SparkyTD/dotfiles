@@ -722,8 +722,8 @@ arch_install_postgui() {
     # Update Hyprland PM and add plugins
     echo -e "${YELLOW}Updating Hyprland PM and adding plugin repos...${NC}"
     hyprpm update
-    hyprpm add https://github.com/levnikmyskin/hyprland-virtual-desktops
-    hyprpm add https://github.com/hyprwm/hyprland-plugins
+    yes | hyprpm add https://github.com/levnikmyskin/hyprland-virtual-desktops
+    yes | hyprpm add https://github.com/hyprwm/hyprland-plugins
     
     # Clone dotfiles repo into .config
     echo -e "${YELLOW}Setting up configuration files...${NC}"
@@ -744,6 +744,18 @@ arch_install_postgui() {
 ############################
 ## INSTALL PHASE SELECTOR ##
 ############################
+
+# Try to connect to wifi
+if [ -d /var/lib/iwd/ ]; then
+    iwd_data=$(find /var/lib/iwd -type f -name "*.psk" | head -n 1)
+    if [ -f $iwd_data ]; then
+        wifi_name=$(basename "$iwd_data" .psk)
+        wifi_adapter="wlan0"
+
+        iwctl device $wifi_adapter set-property Powered on
+        echo "" | iwctl station $wifi_adapter connect $wifi_name
+    fi
+fi
 
 # Exit on error
 set -e
