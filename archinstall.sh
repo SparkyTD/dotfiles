@@ -9,7 +9,7 @@ HOSTNAME="archlinux"
 LOCALE="en_US.UTF-8"
 
 # Packages
-PACKAGES_BASE=(base base-devel linux linux-firmware linux-headers sudo)
+PACKAGES_BASE=(base base-devel linux-cachyos linux-firmware linux-headers sudo)
 PACKAGES_BOOT=(os-prober grub efibootmgr dosfstools mtools)
 PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less tldr github-cli networkmanager openssh tmux iwd dhcpcd pavucontrol github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nmap openbsd-netcat dbus-broker-units mkinitcpio)
 PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct nwg-look kvantum kvantum-qt5 nautilus dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland python-pywal pipewire-pulse pipewire-jack qt6-multimedia-ffmpeg)
@@ -375,7 +375,13 @@ arch_install_live() {
 	
 	# Enable remote SSH access
 	enable_ssh
-	
+
+        # Add CachyOS Repository
+        curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+        tar xvf cachyos-repo.tar.xz && cd cachyos-repo
+        chmod +x ./cachyos-repo.sh 
+        ./cachyos-repo.sh
+
 	# Update pacman
 	echo -e "${YELLOW}Updating installer packages...${NC}"
 	output=$(pacman -Sy --noconfirm 2>&1)
