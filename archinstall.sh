@@ -9,7 +9,7 @@ HOSTNAME="archlinux"
 LOCALE="en_US.UTF-8"
 
 # Packages
-PACKAGES_BASE=(base base-devel linux linux-firmware linux-headers sudo)
+PACKAGES_BASE=(base base-devel linux-zen linux-firmware linux-zen-headers sudo)
 PACKAGES_BOOT=(os-prober grub efibootmgr dosfstools mtools)
 PACKAGES_EXTRA=(git hyfetch htop curl wget mc nano neovim less tldr github-cli networkmanager openssh tmux iwd dhcpcd pavucontrol github-cli wl-clipboard openrgb fzf dotnet-sdk dotnet-runtime aspnet-runtime docker nmap openbsd-netcat dbus-broker-units mkinitcpio)
 PACKAGES_GUI=(hyprland hyprpaper kitty alacritty waybar rofi-wayland ttf-firacode-nerd noto-fonts-emoji qt5ct nwg-look kvantum kvantum-qt5 nautilus dolphin xwaylandvideobridge xdg-desktop-portal xdg-desktop-portal-hyprland python-pywal pipewire-pulse pipewire-jack qt6-multimedia-ffmpeg)
@@ -485,9 +485,9 @@ arch_install_live() {
 	chmod +x /mnt/installer/archinstall.sh
 	
 	# Transfer wifi connection data, if any
-	if [ ! -z /var/lib/iwd/ ] && [ -d /var/lib/iwd/ ]; then
+	if [ -d /var/lib/iwd/ ]; then
 		iwd_data=$(find /var/lib/iwd -type f -name "*.psk" | head -n 1)
-		if [ -f $iwd_data ]; then
+		if [ ! -z "$iwd_data" ] && [ -f "$iwd_data" ]; then
 			mkdir -p /mnt/var/lib/iwd/
 			cp "$iwd_data" /mnt/var/lib/iwd/
 		fi
