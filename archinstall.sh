@@ -447,6 +447,11 @@ arch_install_live() {
 		exit
 	fi
 
+	# Unmount partitions
+ 	set +e
+	umount -lR /mnt > /dev/null 2>&1
+ 	swapoff $DEV_SWAP > /dev/null 2>&1
+  	set -e
 	
 	# Format partitions
 	echo -e "${YELLOW}Formatting EFI partition...${NC}"
