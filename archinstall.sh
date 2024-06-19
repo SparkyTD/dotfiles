@@ -362,6 +362,107 @@ revert_root_login_prompt() {
 	set -e
 }
 
+grub_add_cmdline() {
+    local option=$1
+    local key=${option%%=*}
+    local value=${option#*=}
+
+    local grub_path="/etc/default/grub"
+
+    # Backup the original grub file
+    cp $grub_path ${grub_path}.bak
+
+    # Extract the current GRUB_CMDLINE_LINUX_DEFAULT value
+    current_cmdline=$(grep -oP '(?<=^GRUB_CMDLINE_LINUX_DEFAULT=")[^"]*' $grub_path)
+
+    # Remove the existing option if it exists
+    updated_cmdline=$(echo "$current_cmdline" | sed -E "s/(^| )$key=[^ ]*//g")
+
+    # Add the new option
+    updated_cmdline="$updated_cmdline $option"
+    updated_cmdline=$(echo "$updated_cmdline" | sed 's/^ *//;s/ *$//')
+
+    # Replace the GRUB_CMDLINE_LINUX_DEFAULT line in the grub file
+    sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\"/GRUB_CMDLINE_LINUX_DEFAULT=\"$updated_cmdline\"/" $grub_path
+}
+
+grub_remove_cmdline() {
+    local key=$1
+
+    local grub_path="./etc/default/grub"
+
+    # Backup the original grub file
+    cp $grub_path ${grub_path}.bak
+
+    # Extract the current GRUB_CMDLINE_LINUX_DEFAULT value
+    current_cmdline=$(grep -oP '(?<=^GRUB_CMDLINE_LINUX_DEFAULT=")[^"]*' $grub_path)
+
+    # Remove the specified key (both key-only and key=value pairs)
+    updated_cmdline=$(echo "$current_cmdline" | sed -E "s/(^| )$key(=[^ ]*)?( |$)//g")
+    updated_cmdline=$(echo "$updated_cmdline" | sed 's/^ *//;s/ *$//')
+
+    # Replace the GRUB_CMDLINE_LINUX_DEFAULT line in the grub file
+    sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\"/GRUB_CMDLINE_LINUX_DEFAULT=\"$updated_cmdline\"/" $grub_path
+}
+
+mkinitcpio_insert_module() {
+    local module=$1
+    local index=$2
+
+    local mkinitcpio_conf="./etc/mkinitcpio.conf"
+
+    # Backup the original mkinitcpio.conf file
+    cp "$mkinitcpio_conf" "$mkinitcpio_conf.bak"
+
+    # Extract the current MODULES array
+    current_modules=$(grep -oP '(?<=^MODULES=\()[^)]*' "$mkinitcpio_conf")
+
+    # Convert current MODULES string to array
+    IFS=' ' read -r -a modules_array <<< "$current_modules"
+
+    # Calculate the insertion index if it's negative
+    if [ $index -lt 0 ]; then
+        index=$(( ${#modules_array[@]} + index + 1 ))
+    fi
+
+    # Insert the module into the array
+    modules_array=("${modules_array[@]:0:$index}" "$module" "${modules_array[@]:$index}")
+
+    # Convert the array back to a string
+    updated_modules="${modules_array[*]}"
+
+    # Replace the MODULES array in the mkinitcpio.conf file
+    sed -i "s/^MODULES=(.*)/MODULES=( ${updated_modules} )/" "$mkinitcpio_conf"
+}
+
+mkinitcpio_remove_module() {
+    local module=$1
+
+    local mkinitcpio_conf="./etc/mkinitcpio.conf"
+
+    # Backup the original mkinitcpio.conf file
+    cp "$mkinitcpio_conf" "$mkinitcpio_conf.bak"
+
+    # Extract the current MODULES array
+    current_modules=$(grep -oP '(?<=^MODULES=\()[^)]*' "$mkinitcpio_conf")
+
+    # Convert current MODULES string to array
+    IFS=' ' read -r -a modules_array <<< "$current_modules"
+
+    # Remove the specified module from the array
+    for i in "${!modules_array[@]}"; do
+        if [ "${modules_array[$i]}" == "$module" ]; then
+            unset 'modules_array[$i]'
+        fi
+    done
+
+    # Convert the array back to a string
+    updated_modules="${modules_array[*]}"
+
+    # Replace the MODULES array in the mkinitcpio.conf file
+    sed -i "s/^MODULES=(.*)/MODULES=( ${updated_modules} )/" "$mkinitcpio_conf"
+}
+
 
 
 #########################
@@ -598,8 +699,8 @@ arch_install_user() {
 	sudo chown -R $USER /installer
 	
 	# Miscellaneous stuff
-    echo -e "${CYAN}Configuring git default branch to 'master'...${NC}"
-    git config --global init.defaultBranch master
+        echo -e "${CYAN}Configuring git default branch to 'master'...${NC}"
+        git config --global init.defaultBranch master
 
 	# Install nvidia-all
 	detect_nvidia
