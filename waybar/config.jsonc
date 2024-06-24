@@ -9,9 +9,15 @@
     "output": "DP-3",
     "modules-left": ["clock"],
     "modules-center": ["hyprland/window"],
-    "modules-right": ["network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "tray"],
+    "modules-right": ["network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "hyprland/language", "tray"],
     "hyprland/window": {
         "format": "{}"
+    },
+
+    "hyprland/language": {
+        "format": "{}",
+        "format-us": "us",
+        "keyboard-name": "razer-razer-ornata-chroma"
     },
 
     "hyprland/workspaces": {
