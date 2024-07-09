@@ -7,9 +7,16 @@
     "gtk-layer-shell": true,
     "height": 40,
     "output": "DP-3",
-    "modules-left": ["clock"],
+    "modules-left": ["clock", "hyprland/language", "custom/vdesk"],
     "modules-center": ["hyprland/window"],
-    "modules-right": ["network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "hyprland/language", "tray"],
+    "modules-right": ["network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "tray"],
+
+    "custom/vdesk": {
+        "format": "{}",
+        "exec": "$HOME/.config/waybar/vdesk.sh",
+        "return-type": "json"
+    },
+
     "hyprland/window": {
         "format": "{}"
     },

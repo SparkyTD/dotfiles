@@ -60,7 +60,8 @@ tooltip {
 #workspaces,
 #tray,
 #backlight,
-#language{
+#language,
+#custom-vdesk {
     background: #1e1e2e;
     opacity: 0.8;
     padding: 0px 10px;
@@ -82,7 +83,7 @@ tooltip {
 }
 
 #tray {
-    border-radius: 10px;
+    border-radius: 0 10px 10px 0;
     margin-right: 10px;
 }
 
@@ -154,6 +155,8 @@ tooltip {
 }
 
 #language {
-    border-radius: 0px 10px 10px 0px;
 }
 
+#custom-vdesk {
+    border-radius: 0px 10px 10px 0px;
+}
