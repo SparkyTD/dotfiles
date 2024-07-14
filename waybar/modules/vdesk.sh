@@ -19,8 +19,14 @@ desktop_indicator() {
 last_vdesk="0"
 active_vdesk=""
 print_indicator() {
-    active_vdesk=$(hyprctl printstate | grep "Focused: true" -B1 | head -n 1 | cut -d ' ' -f 2 | cut -d ':' -f 1)
-    max_vdesk=$(hyprctl printstate | grep "Focused:" | wc -l)
+    vdesk_state=$(hyprctl printstate)
+    active_vdesk=$(echo "$vdesk_state" | grep "Focused: true" -B1 | head -n 1 | cut -d ' ' -f 2 | cut -d ':' -f 1)
+    max_vdesk=$(echo "$vdesk_state" | grep "Focused:" | wc -l)
+    if (( active_vdesk <= 4 )); then
+        max_vdesk=4
+    elif (( max_vdesk > 4 )); then
+        max_vdesk=$active_vdesk
+    fi
     indicator=$(desktop_indicator $max_vdesk $active_vdesk)
 
     if [ $active_vdesk -ne $last_vdesk ]; then

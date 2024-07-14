@@ -6,15 +6,22 @@
     "passthrough": false,
     "gtk-layer-shell": true,
     "height": 40,
-    "output": "DP-3",
+    "output": ["DP-3", "HDMI-A-2"],
     "modules-left": ["clock", "hyprland/language", "custom/vdesk"],
     "modules-center": ["hyprland/window"],
-    "modules-right": ["network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "tray"],
+    "modules-right": ["custom/ovpn", "network", "bluetooth", "pulseaudio", "pulseaudio#microphone", "tray"],
 
     "custom/vdesk": {
         "format": "{}",
-        "exec": "$HOME/.config/waybar/vdesk.sh",
+        "exec": "$HOME/.config/waybar/modules/vdesk.sh",
         "return-type": "json"
+    },
+
+    "custom/ovpn": {
+        "format": "{}",
+        "exec": "$HOME/.config/waybar/modules/ovpn_status.sh",
+        "return-type": "json",
+        "on-click": "$HOME/.config/waybar/modules/ovpn_toggle.sh"
     },
 
     "hyprland/window": {

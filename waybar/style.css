@@ -61,6 +61,7 @@ tooltip {
 #tray,
 #backlight,
 #language,
+#custom-ovpn,
 #custom-vdesk {
     background: #1e1e2e;
     opacity: 0.8;
@@ -116,7 +117,7 @@ tooltip {
 
 #network {
     color: #f9e2af;
-    border-radius: 10px 0px 0px 10px;
+    border-radius: 0px 0px 0px 0px;
     border-left: 0px;
     border-right: 0px;
 }
@@ -159,4 +160,8 @@ tooltip {
 
 #custom-vdesk {
     border-radius: 0px 10px 10px 0px;
+}
+
+#custom-ovpn {
+    border-radius: 10px 0px 0px 10px;
 }
