@@ -5,7 +5,7 @@ auto_save_setup=true
 preallocate_space=false
 auto_menu=false
 use_internal_view=true
-use_internal_edit=true
+use_internal_edit=false
 clear_before_exec=true
 confirm_delete=true
 confirm_overwrite=true
@@ -84,10 +84,11 @@ editor_filesize_threshold=64M
 editor_stop_format_chars=-+*\\,.;:&>
 mcview_eof=
 skin=yadt256-defbg
+filepos_max_saved_entries=1024
 
 [Layout]
 output_lines=0
-left_panel_size=63
+left_panel_size=126
 top_panel_size=0
 message_visible=true
 keybar_visible=true
@@ -138,7 +139,7 @@ quick_search_mode=2
 select_flags=6
 
 [Panelize]
-Find *.orig after patching=find . -name \\*.orig -print
 Find SUID and SGID programs=find . \\( \\( -perm -04000 -a -perm /011 \\) -o \\( -perm -02000 -a -perm /01 \\) \\) -print
-Modified git files=git ls-files --modified
+Find *.orig after patching=find . -name \\*.orig -print
 Find rejects after patching=find . -name \\*.rej -print
+Modified git files=git ls-files --modified

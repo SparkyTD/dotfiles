@@ -23,7 +23,7 @@ update_indicator() {
     elif [ "$status" = "disconnecting" ]; then
         status_text="Disconnecting..."
         status_icon="$ICON_CONNECTING"
-    elif [ "$status" = "disconnected" ]; then
+    else
         status_text="VPN: Disconnected"
         status_icon="$ICON_DISCONNECTED"
     fi
@@ -34,6 +34,10 @@ update_indicator() {
 update_indicator
 
 while true; do
+    if [ ! -f $STATUS_FILE ]; then
+        touch $STATUS_FILE
+    fi
+
     inotifywait -qq -e modify $STATUS_FILE > /dev/null
     update_indicator
 done
