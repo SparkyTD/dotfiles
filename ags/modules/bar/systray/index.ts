@@ -11,9 +11,13 @@ const SysTray = () => {
     const items = Utils.merge(
         [systemtray.bind("items"), ignore.bind("value")],
         (items, ignored) => {
-            const filteredTray = items.filter(({ id }) => !ignored.includes(id));
+            const filteredTray = items
+                .filter(({ id }) => !!id)
+                .filter(({ id }) => !ignored.includes(id));
 
             isVis.value = filteredTray.length > 0;
+
+            console.log(filteredTray);
 
             return filteredTray.map((item) => {
                 if (item.menu !== undefined) {

@@ -710,8 +710,7 @@ const options = mkOptions(OPTIONS, {
         },
         systray: {
             ignore: opt([
-                "KDE Connect Indicator",
-                "spotify-client",
+                "KDE Connect Indicator"
             ]),
         },
         clock: {
