@@ -17,7 +17,7 @@ function injectHyprEventInterceptor() {
         return hyprland["injectedVariable"];
     }
 
-    const currentWorkspace = Variable(hyprland.active.workspace.id / hyprland.monitors.length);
+    const currentWorkspace = Variable(Math.ceil(hyprland.active.workspace.id / hyprland.monitors.length));
     const newEventHandler = hyprland["_onEvent"] = async function(event: string) {
         const [e, params] = event.split('>>');
         const argv = params.split(',');

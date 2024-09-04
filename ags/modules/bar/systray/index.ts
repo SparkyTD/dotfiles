@@ -17,8 +17,6 @@ const SysTray = () => {
 
             isVis.value = filteredTray.length > 0;
 
-            console.log(filteredTray);
-
             return filteredTray.map((item) => {
                 if (item.menu !== undefined) {
                     item.menu["class_name"] = "systray-menu";
