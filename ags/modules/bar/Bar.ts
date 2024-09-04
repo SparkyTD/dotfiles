@@ -11,6 +11,7 @@ import { BatteryLabel } from "./battery/index.js";
 import { Clock } from "./clock/index.js";
 import { SysTray } from "./systray/index.js";
 import { OpenVPN3 } from "./openvpn3/index.js";
+import { KeyboardLayout } from "./keyboard_layout/index.js";
 const hyprland = await Service.import("hyprland");
 
 import { BarItemBox as WidgetContainer } from "../shared/barItemBox.js";
@@ -37,7 +38,8 @@ type Section = "battery"
     | "bluetooth"
     | "clock"
     | "systray"
-    | "openvpn3";
+    | "openvpn3"
+    | "keyboard_layout";
 
 type Layout = {
     left: Section[],
@@ -56,6 +58,7 @@ const getModulesForMonitor = (monitor: number, curLayouts: BarLayout) => {
         left: [
             "dashboard",
             "clock",
+            "keyboard_layout",
             "workspaces2",
             //"workspaces",
             // "media"
@@ -95,7 +98,8 @@ const widget = {
     bluetooth: () => WidgetContainer(Bluetooth()),
     clock: () => WidgetContainer(Clock()),
     systray: () => WidgetContainer(SysTray()),
-    openvpn3: () => WidgetContainer(OpenVPN3())
+    openvpn3: () => WidgetContainer(OpenVPN3()),
+    keyboard_layout: () => WidgetContainer(KeyboardLayout())
 };
 
 type GdkMonitors = {
