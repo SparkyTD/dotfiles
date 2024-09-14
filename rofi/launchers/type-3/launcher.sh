@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+RUNNING_PID=$(ps -aux | grep -v grep | grep rofi | grep -v bash | awk '{ if ($11 == "rofi") {print $2} }')
+if [ ! -z "$RUNNING_PID" ]; then
+    kill -9 "$RUNNING_PID"
+    exit 0
+fi
+
 ## Author : Aditya Shakya (adi1090x)
 ## Github : @adi1090x
 #
