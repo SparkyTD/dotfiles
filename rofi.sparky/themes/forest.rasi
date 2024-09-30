@@ -1,0 +1,12 @@
+* {
+    font-family: 'FiraCode Nerd Font Mono';
+    bg-col: #232b38;
+    bg-col-light: #5d536b;
+    border-col: #1e2326;
+    selected-col: #5d536b;
+    blue: #347fc4;
+    fg-col: #d3c6aa;
+    fg-col2: #d3c6aa;
+    grey: #7a8478;
+    width: 400;
+}
