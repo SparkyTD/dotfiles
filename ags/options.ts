@@ -80,7 +80,7 @@ const options = mkOptions(OPTIONS, {
             contrast: opt(0.0),
         },
         font: {
-            size: opt("1.2rem"),
+            size: opt("1rem"),
             name: opt("Ubuntu Nerd Font"),
             weight: opt(600),
         },

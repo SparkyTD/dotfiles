@@ -38,6 +38,7 @@ const Clock = () => {
                 return `bluetooth ${styleMap[btnStyle]} ${!shwLbl ? "no-label" : ""} ${!shwIcn ? "no-icon" : ""}`;
             }),
             children: Utils.merge([showIcon.bind("value"), showTime.bind("value")], (shIcn, shTm) => {
+                shTm = true;
 
                 if (shIcn && !shTm) {
                     return [clockIcon];
